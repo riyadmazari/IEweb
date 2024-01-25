@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IE Tower Virtual Tour</title>
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: Cabril, sans-serif;
+            background-color: #f0f7ff; /* Light blue background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #tour-container {
+            text-align: center;
+            width: 90%;
+            max-width: 800px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        #final-screen {
+            display: none; /* Hidden by default */
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            text-align: center;
+        }
+
+        #tour-container img {
+            width: 100%;
+            height: 300px; /* Fixed height for all images */
+            object-fit: cover; /* Ensures images cover the area without stretching */
+        }
+
+        #description {
+            padding: 15px;
+            background-color: white;
+            color: #0056b3;
+        }
+
+        #navigation {
+            padding: 10px;
+            background-color: #e6f2ff;
+            text-align: center;
+        }
+
+        #navigation button {
+            padding: 10px 20px;
+            margin: 0 5px;
+            border: none;
+            border-radius: 5px;
+            background-color: #0056b3;
+            color: white;
+            cursor: pointer;
+        }
+
+        #navigation button:hover {
+            background-color: #003d82;
+        }
+
+        #navigation button:disabled {
+            background-color: #cccccc;
+            cursor: default;
+        }
+
+        /* Smaller logo on the final screen */
+        #final-logo {
+            width: 100px;
+            height: auto;
+            margin-bottom: 30px;
+        }
+        #logo {
+            display: block; /* Centers the logo in its container */
+            max-width: 150px;
+            margin: 0 auto 20px; /* Adds space below the logo */
+            object-fit: cover;
+        }
+    </style>
+</head>
+<body>
+<!-- This will be our final screen container, initially hidden -->
+<div id="final-screen" class="hide">
+    <img id="final-logo" src="IE_University_logo.png" alt="IE University Logo" style="width: 200px; display: block;">
+    <p>Thank you for taking the tour! We hope you enjoyed exploring IE University.</p>
+</div>
+
+<div id="tour-container">
+    <img id="logo" src="IE_University_logo.png" alt="IE University Logo">
+    <img id="current-image" src="tower.png" alt="IE Tower">
+    <div id="description">Welcome to the IE Tower! This is the main entrance...</div>
+    <div id="navigation">
+        <button id="prev" disabled>Previous</button>
+        <button id="next">Next</button>
+        <!-- The End Tour button will be hidden initially and only shown on the last image -->
+        <button id="end-tour" class="hide">End Tour</button>
+    </div>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const tourStops = [
+            { src: 'tower.png', alt: 'IE Tower', desc: 'Welcome to the IE Tower! This majestic building is where our journey begins.' },
+            { src: 'IE_frontentry.png', alt: 'IE Front Entry', desc: 'Standing at the front entry, we are about to step into a world of innovation.' },
+            { src: 'reception.png', alt: 'Reception', desc: 'Here is the reception, the heart of our tower where all paths begin.' },
+            { src: 'hub1.png', alt: '4th Floor Hub', desc: 'The 4th-floor hub is where ideas come to life, fostering collaboration and learning.' },
+            { src: 'cafetaria.png', alt: 'Cafeteria', desc: 'Our cafeteria offers a variety of healthy and delicious food options for all tastes.' },
+            { src: 'class.png', alt: 'Classroom', desc: 'Our classrooms are equipped with state-of-the-art technology for a modern learning experience.' },
+            { src: 'reception.png', alt: 'Reception', desc: 'Back to the reception, let’s take a moment to relax in the rest and work area.' },
+            { src: 'rest_and_work.png', alt: 'Rest and Work Area', desc: 'This area is designed for comfort and productivity, a perfect spot for a quick break or focused work.' },
+            { src: 'visual_art.png', alt: 'Visual Art Display', desc: 'Experience the intersection of education and culture with our visual art displays.' },
+            { src: 'auditorium.png', alt: 'Auditorium', desc: 'The auditorium is a space where knowledge and culture converge in the heart of our tower.' },
+            { src: 'ext_athe.png', alt: 'Athletics Track', desc: 'Outdoor spaces like our athletics track provide a perfect environment for recreation and events.' },
+            { src: 'terrain.png', alt: 'Sports Field', desc: 'The sports field is designed for versatility, supporting a wide range of athletic activities.' },
+            { src: 'pool.png', alt: 'Swimming Pool', desc: 'The swimming pool is an oasis for relaxation and physical activity.' }
+        ];
+
+        let currentIndex = 0;
+        const imageElement = document.getElementById('current-image');
+        const descriptionElement = document.getElementById('description');
+        const prevButton = document.getElementById('prev');
+        const nextButton = document.getElementById('next');
+        const endTourButton = document.getElementById('end-tour');
+        const tourContainer = document.getElementById('tour-container');
+        const finalScreen = document.getElementById('final-screen');
+        const logo = document.getElementById('logo');
+
+        function updateTourStop() {
+            const tourStop = tourStops[currentIndex];
+            imageElement.src = tourStop.src;
+            imageElement.alt = tourStop.alt;
+            descriptionElement.textContent = tourStop.desc;
+
+            // Handle button visibility
+            prevButton.style.display = currentIndex > 0 ? 'block' : 'none';
+            nextButton.style.display = currentIndex < tourStops.length - 1 ? 'block' : 'none';
+            endTourButton.style.display = currentIndex === tourStops.length - 1 ? 'block' : 'none';
+        }
+
+        prevButton.addEventListener('click', () => {
+            if (currentIndex > 0) {
+                currentIndex--;
+                updateTourStop();
+            }
+        });
+
+        nextButton.addEventListener('click', () => {
+            if (currentIndex < tourStops.length - 1) {
+                currentIndex++;
+                updateTourStop();
+            }
+        });
+
+        endTourButton.addEventListener('click', () => {
+            tourContainer.style.display = 'none'; // Hide the tour container
+            finalScreen.style.display = 'flex'; // Show the final screen
+            logo.style.display = 'none'; // Hide the main logo
+        });
+
+        updateTourStop(); // Initialize the tour
+    });
+</script>
+</body>
+</html>
